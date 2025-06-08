@@ -21,9 +21,9 @@
 ## 🖼️ Pré-visualização
 
 ### Tela de Login
-![Tela de Login](https://github.com/geraldojoao/BookFinder/blob/main/BookFinder/home.PNG)
+![Tela de Login](https://github.com/rafaelquintela/-BookFinder/blob/main/BookFinder/login.PNG)
 
 ### Tela de Resultados da Busca
-![Tela de Resultados](https://github.com/geraldojoao/BookFinder/blob/main/BookFinder/lista.PNG)
+![Tela de Resultados](https://github.com/rafaelquintela/-BookFinder/blob/main/BookFinder/lista.PNG)
 
 
