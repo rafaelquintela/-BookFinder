@@ -1,0 +1,215 @@
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, 'about');
+              },
+              child: const Text('Sobre o App'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FavoritesScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Favoritos')),
+      body: Consumer<FavoritesModel>(
+        builder: (context, favoritesModel, child) {
+          return favoritesModel.items.isEmpty
+              ? const Center(child: Text('Nenhum livro favoritado.'))
+              : ListView.builder(
+                  itemCount: favoritesModel.items.length,
+                  itemBuilder: (context, index) {
+                    final book = favoritesModel.items[index];
+                    final title = book['title'] ?? 'Sem título';
+                    final authors = (book['authors'] ?? ['Desconhecido']).join(
+                      ', ',
+                    );
+                    final imageUrl = book['imageLinks']?['thumbnail'];
+                    return Card(
+                      elevation: 3,
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Dismissible(
+                        key: Key(book.toString()),
+                        onDismissed: (direction) {
+                          favoritesModel.remove(book);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('$title removido dos favoritos'),
+                            ),
+                          );
+                        },
+                        background: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20.0),
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        child: ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: imageUrl != null
+                                ? Image.network(
+                                    imageUrl,
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (
+                                          BuildContext context,
+                                          Object exception,
+                                          StackTrace? stackTrace,
+                                        ) {
+                                          return const Icon(
+                                            Icons.image_not_supported,
+                                            size: 50,
+                                          );
+                                        },
+                                  )
+                                : const Icon(Icons.book, size: 50),
+                          ),
+                          title: Text(title),
+                          subtitle: Text(authors),
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              'details',
+                              arguments: book,
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                );
+        },
+      ),
+    );
+  }
+}
+
+class AboutScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Sobre o App')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'BookFinder',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text('Versão 1.0.0'),
+            const SizedBox(height: 16),
+            const Text('Desenvolvedor: Rafael Quintela'),
+            const SizedBox(height: 16),
+            InkWell(
+              child: const Text(
+                'GitHub Repository',
+                style: TextStyle(color: Colors.blueAccent),
+              ),
+              onTap: () async {
+                const url = 'https://github.com/rafaelquintela/-BookFinder';
+                if (await url_launcher.canLaunchUrl(Uri.parse(url))) {
+                  await url_launcher.launchUrl(Uri.parse(url));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Não foi possível abrir o link'),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OnboardingScreen extends StatefulWidget {
+  @override
+  _OnboardingScreenState createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _pageController = PageController(initialPage: 0);
+  int _currentPage = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                children: [
+                  _buildPage(
+                    title: 'Bem-vindo ao BookFinder!',
+                    description:
+                        'Encontre seus livros favoritos de forma rápida e fácil.',
+                    image:
+                        'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+                  ),
+                  _buildPage(
+                    title: 'Pesquise e Descubra',
+                    description:
+                        'Use nossa poderosa ferramenta de pesquisa para encontrar qualquer livro que você imaginar.',
+                    image:
+                        'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+                  ),
+                  _buildPage(
+                    title: 'Salve seus Favoritos',
+                    description:
+                        'Adicione livros à sua lista de favoritos e acesse-os quando quiser.',
+                    image:
+                        'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: _buildPageIndicator(),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, 'search');
+              },
+              child: const Text('Começar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPage({
+    required String title,
